@@ -28,7 +28,7 @@ Backend: The Laravel API must be running.
 
 Clone the Repository
 
-git clone [https://github.com/yourusername/residential_booking_app_admin.git](https://github.com/yourusername/residential_booking_app_admin.git)
+git clone [https://github.com/yamenhawari/residential_booking_app_admin_dashboard.git](https://github.com/yamenhawari/residential_booking_app_admin_dashboard.git)
 cd residential_booking_app_admin
 
 Install Dependencies
