@@ -14,6 +14,10 @@ class AdminStat extends Equatable {
   });
 
   @override
-  List<Object> get props => [totalUsers, pendingUsers, activeUsers, totalBookings];
+  List<Object> get props => [
+    totalUsers,
+    pendingUsers,
+    activeUsers,
+    totalBookings,
+  ];
 }
-

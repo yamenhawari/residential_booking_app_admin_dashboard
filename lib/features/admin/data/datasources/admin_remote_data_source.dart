@@ -11,6 +11,8 @@ abstract class AdminRemoteDataSource {
   Future<List<AdminUserModel>> getUsers();
   Future<Unit> approveUser(int id);
   Future<Unit> deleteUser(int id);
+  Future<Unit> rejectUser(int id);
+  Future<Unit> sendBroadcast(String title, String body);
 }
 
 class AdminRemoteDataSourceImpl implements AdminRemoteDataSource {
@@ -54,7 +56,9 @@ class AdminRemoteDataSourceImpl implements AdminRemoteDataSource {
 
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
-      return (data['data'] as List).map((e) => AdminUserModel.fromJson(e)).toList();
+      return (data['data'] as List)
+          .map((e) => AdminUserModel.fromJson(e))
+          .toList();
     } else {
       throw Exception('Failed to load users');
     }
@@ -71,6 +75,16 @@ class AdminRemoteDataSourceImpl implements AdminRemoteDataSource {
   }
 
   @override
+  Future<Unit> rejectUser(int id) async {
+    final response = await client.put(
+      Uri.parse('${ApiConstants.baseUrl}/admin/users/$id/reject'),
+      headers: await _getHeaders(),
+    );
+    if (response.statusCode >= 200 && response.statusCode < 300) return unit;
+    throw Exception('Failed to reject');
+  }
+
+  @override
   Future<Unit> deleteUser(int id) async {
     final response = await client.delete(
       Uri.parse('${ApiConstants.baseUrl}/admin/users/$id'),
@@ -79,5 +93,15 @@ class AdminRemoteDataSourceImpl implements AdminRemoteDataSource {
     if (response.statusCode >= 200 && response.statusCode < 300) return unit;
     throw Exception('Failed to delete');
   }
-}
 
+  @override
+  Future<Unit> sendBroadcast(String title, String body) async {
+    final response = await client.post(
+      Uri.parse('${ApiConstants.baseUrl}/admin/notifications/broadcast'),
+      headers: await _getHeaders(),
+      body: jsonEncode({'title': title, 'body': body}),
+    );
+    if (response.statusCode >= 200 && response.statusCode < 300) return unit;
+    throw Exception('Failed to broadcast');
+  }
+}

@@ -7,6 +7,7 @@ abstract class AdminRepository {
   Future<Either<Failure, AdminStat>> getStats();
   Future<Either<Failure, List<AdminUser>>> getUsers();
   Future<Either<Failure, Unit>> approveUser(int id);
+  Future<Either<Failure, Unit>> rejectUser(int id);
   Future<Either<Failure, Unit>> deleteUser(int id);
+  Future<Either<Failure, Unit>> sendBroadcast(String title, String body);
 }
-

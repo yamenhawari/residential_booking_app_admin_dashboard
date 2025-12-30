@@ -15,6 +15,7 @@ class DashboardLoaded extends AdminState {
   final AdminStat stats;
   final List<AdminUser> users;
   DashboardLoaded(this.stats, this.users);
+
   @override
   List<Object> get props => [stats, users];
 }
@@ -22,7 +23,7 @@ class DashboardLoaded extends AdminState {
 class AdminError extends AdminState {
   final String message;
   AdminError(this.message);
+
   @override
   List<Object> get props => [message];
 }
-

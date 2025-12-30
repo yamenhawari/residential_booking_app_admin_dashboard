@@ -10,45 +10,41 @@ import '../../features/admin/data/datasources/admin_remote_data_source.dart';
 import '../../features/admin/data/repositories/admin_repository_impl.dart';
 import '../../features/admin/domain/repositories/admin_repository.dart';
 import '../../features/admin/presentation/cubit/admin_cubit.dart';
+import '../../features/admin/domain/usecases/get_dashboard_data_usecase.dart';
 
 final sl = GetIt.instance;
 
 Future<void> init() async {
   const storage = FlutterSecureStorage();
 
-  // External dependencies
+  // External
   sl.registerLazySingleton(() => http.Client());
 
-  // Auth feature
+  // Data Sources
   sl.registerLazySingleton<AuthLocalDataSource>(
     () => AuthLocalDataSourceImpl(storage),
   );
-
   sl.registerLazySingleton<AuthRemoteDataSource>(
     () => AuthRemoteDataSourceImpl(client: sl()),
   );
-
-  sl.registerLazySingleton<AuthRepository>(
-    () => AuthRepositoryImpl(
-      remoteDataSource: sl(),
-      localDataSource: sl(),
-    ),
-  );
-
-  sl.registerFactory(() => AuthCubit(repository: sl()));
-
-  // Admin feature
   sl.registerLazySingleton<AdminRemoteDataSource>(
-    () => AdminRemoteDataSourceImpl(
-      client: sl(),
-      authLocalDataSource: sl(),
-    ),
+    () => AdminRemoteDataSourceImpl(client: sl(), authLocalDataSource: sl()),
   );
 
+  // Repositories
+  sl.registerLazySingleton<AuthRepository>(
+    () => AuthRepositoryImpl(remoteDataSource: sl(), localDataSource: sl()),
+  );
   sl.registerLazySingleton<AdminRepository>(
     () => AdminRepositoryImpl(remoteDataSource: sl()),
   );
 
-  sl.registerFactory(() => AdminCubit(repository: sl()));
-}
+  // Use Cases
+  sl.registerLazySingleton(() => GetDashboardDataUseCase(sl()));
 
+  // Cubits
+  sl.registerFactory(() => AuthCubit(repository: sl()));
+  sl.registerFactory(
+    () => AdminCubit(getDashboardDataUseCase: sl(), repository: sl()),
+  );
+}

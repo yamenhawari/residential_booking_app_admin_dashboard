@@ -14,7 +14,7 @@ class AdminUserModel extends AdminUser {
   factory AdminUserModel.fromJson(Map<String, dynamic> json) {
     final email = json['email'];
     final phone = json['phone'];
-    
+
     return AdminUserModel(
       id: json['id'],
       name: "${json['first_name']} ${json['last_name']}",
@@ -26,4 +26,3 @@ class AdminUserModel extends AdminUser {
     );
   }
 }
-

@@ -22,4 +22,3 @@ class AdminUser extends Equatable {
   @override
   List<Object?> get props => [id, name, email, phone, role, status, imageUrl];
 }
-

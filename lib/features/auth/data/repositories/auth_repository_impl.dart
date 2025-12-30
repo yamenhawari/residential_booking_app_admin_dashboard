@@ -14,11 +14,18 @@ class AuthRepositoryImpl implements AuthRepository {
   });
 
   @override
-  Future<Either<Failure, String>> login(String phone, String password) async {
+  Future<Either<Failure, Map<String, dynamic>>> login(
+    String phone,
+    String password,
+  ) async {
     try {
-      final token = await remoteDataSource.login(phone, password);
+      final data = await remoteDataSource.login(phone, password);
+      final token = data['token'] as String?;
+      final role = (data['role'] is String) ? data['role'] as String : 'tenant';
+      if (token == null) return Left(ServerFailure('Invalid login response'));
       await localDataSource.saveToken(token);
-      return Right(token);
+      await localDataSource.saveRole(role);
+      return Right({'token': token, 'role': role});
     } catch (e) {
       return Left(ServerFailure(e.toString()));
     }
@@ -44,4 +51,3 @@ class AuthRepositoryImpl implements AuthRepository {
     }
   }
 }
-

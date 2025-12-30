@@ -1,3 +1,5 @@
+// ignore_for_file: deprecated_member_use
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../cubit/auth_cubit.dart';
@@ -68,9 +70,9 @@ class _LoginScreenState extends State<LoginScreen> {
                 child: ElevatedButton(
                   onPressed: () {
                     context.read<AuthCubit>().login(
-                          _phoneCtrl.text,
-                          _passCtrl.text,
-                        );
+                      _phoneCtrl.text,
+                      _passCtrl.text,
+                    );
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF4F46E5),

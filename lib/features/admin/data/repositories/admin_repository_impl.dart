@@ -41,6 +41,16 @@ class AdminRepositoryImpl implements AdminRepository {
   }
 
   @override
+  Future<Either<Failure, Unit>> rejectUser(int id) async {
+    try {
+      await remoteDataSource.rejectUser(id);
+      return const Right(unit);
+    } catch (e) {
+      return const Left(ServerFailure("Reject Failed"));
+    }
+  }
+
+  @override
   Future<Either<Failure, Unit>> deleteUser(int id) async {
     try {
       await remoteDataSource.deleteUser(id);
@@ -49,5 +59,14 @@ class AdminRepositoryImpl implements AdminRepository {
       return const Left(ServerFailure("Delete Failed"));
     }
   }
-}
 
+  @override
+  Future<Either<Failure, Unit>> sendBroadcast(String title, String body) async {
+    try {
+      await remoteDataSource.sendBroadcast(title, body);
+      return const Right(unit);
+    } catch (e) {
+      return const Left(ServerFailure("Broadcast Failed"));
+    }
+  }
+}

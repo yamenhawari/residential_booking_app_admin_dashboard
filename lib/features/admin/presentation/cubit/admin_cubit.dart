@@ -7,9 +7,8 @@ class AdminCubit extends Cubit<AdminState> {
   final AdminRepository repository;
   late final GetDashboardDataUseCase getDashboardDataUseCase;
 
-  AdminCubit({required this.repository})
-    : getDashboardDataUseCase = GetDashboardDataUseCase(repository),
-      super(AdminInitial());
+  AdminCubit({required this.repository, required this.getDashboardDataUseCase})
+    : super(AdminInitial());
 
   void loadDashboard() async {
     emit(AdminLoading());
@@ -20,19 +19,50 @@ class AdminCubit extends Cubit<AdminState> {
     );
   }
 
-  void approveUser(int id) async {
+  Future<bool> approveUser(int id) async {
     final result = await repository.approveUser(id);
+    bool success = false;
     result.fold(
-      (failure) => emit(AdminError(failure.message)),
-      (_) => loadDashboard(),
+      (failure) {
+        emit(AdminError(failure.message));
+        success = false;
+      },
+      (_) {
+        success = true;
+        loadDashboard();
+      },
     );
+    return success;
   }
 
-  void deleteUser(int id) async {
+  Future<bool> deleteUser(int id) async {
     final result = await repository.deleteUser(id);
+    bool success = false;
     result.fold(
-      (failure) => emit(AdminError(failure.message)),
-      (_) => loadDashboard(),
+      (failure) {
+        emit(AdminError(failure.message));
+        success = false;
+      },
+      (_) {
+        success = true;
+        loadDashboard();
+      },
     );
+    return success;
+  }
+
+  Future<bool> sendBroadcast(String title, String body) async {
+    final result = await repository.sendBroadcast(title, body);
+    bool success = false;
+    result.fold(
+      (failure) {
+        emit(AdminError(failure.message));
+        success = false;
+      },
+      (_) {
+        success = true;
+      },
+    );
+    return success;
   }
 }

@@ -6,9 +6,11 @@ import '../repositories/admin_repository.dart';
 
 class GetDashboardDataUseCase {
   final AdminRepository repository;
+
   GetDashboardDataUseCase(this.repository);
 
-  Future<Either<Failure, ({AdminStat stats, List<AdminUser> users})>> call() async {
+  Future<Either<Failure, ({AdminStat stats, List<AdminUser> users})>>
+  call() async {
     final statsResult = await repository.getStats();
     final usersResult = await repository.getUsers();
 
@@ -21,4 +23,3 @@ class GetDashboardDataUseCase {
     );
   }
 }
-
