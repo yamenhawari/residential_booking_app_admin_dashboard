@@ -34,22 +34,31 @@ class _DashboardScreenState extends State<DashboardScreen> {
         return StatefulBuilder(
           builder: (context, setState) {
             return AlertDialog(
+              backgroundColor: Colors.white,
+              surfaceTintColor: Colors.transparent,
               title: Row(
                 children: [
                   Container(
-                    padding: const EdgeInsets.all(8),
+                    padding: const EdgeInsets.all(10),
                     decoration: BoxDecoration(
                       color: const Color(0xFF4F46E5).withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(8),
+                      borderRadius: BorderRadius.circular(10),
                     ),
-                    child: const Icon(Icons.campaign, color: Color(0xFF4F46E5)),
+                    child: const Icon(
+                      Icons.campaign_rounded,
+                      color: Color(0xFF4F46E5),
+                      size: 24,
+                    ),
                   ),
-                  const SizedBox(width: 12),
-                  const Text("Broadcast Notification"),
+                  const SizedBox(width: 16),
+                  const Text(
+                    "Broadcast Message",
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  ),
                 ],
               ),
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16),
+                borderRadius: BorderRadius.circular(20),
               ),
               content: SizedBox(
                 width: 500,
@@ -59,9 +68,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
-                        "Send a push notification to all registered users.",
-                        style: TextStyle(color: Colors.grey, fontSize: 13),
+                      Text(
+                        "Send a push notification to all users. This action cannot be undone.",
+                        style: TextStyle(color: Colors.grey[600], fontSize: 14),
                       ),
                       const SizedBox(height: 24),
                       TextFormField(
@@ -69,12 +78,17 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         validator: (v) =>
                             v!.isEmpty ? 'Title is required' : null,
                         decoration: InputDecoration(
-                          labelText: "Title",
+                          labelText: "Notification Title",
+                          alignLabelWithHint: true,
                           filled: true,
-                          fillColor: Colors.grey[50],
+                          fillColor: const Color(0xFFF8FAFC),
                           border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
+                            borderRadius: BorderRadius.circular(12),
                             borderSide: BorderSide.none,
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: BorderSide(color: Colors.grey.shade200),
                           ),
                         ),
                       ),
@@ -85,12 +99,17 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         validator: (v) =>
                             v!.isEmpty ? 'Message is required' : null,
                         decoration: InputDecoration(
-                          labelText: "Message Body",
+                          labelText: "Message Content",
+                          alignLabelWithHint: true,
                           filled: true,
-                          fillColor: Colors.grey[50],
+                          fillColor: const Color(0xFFF8FAFC),
                           border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
+                            borderRadius: BorderRadius.circular(12),
                             borderSide: BorderSide.none,
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: BorderSide(color: Colors.grey.shade200),
                           ),
                         ),
                       ),
@@ -98,12 +117,16 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   ),
                 ),
               ),
-              actionsPadding: const EdgeInsets.all(20),
+              actionsPadding: const EdgeInsets.all(24),
               actions: [
                 TextButton(
                   onPressed: () => Navigator.pop(ctx),
                   style: TextButton.styleFrom(
                     foregroundColor: Colors.grey[600],
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 20,
+                      vertical: 16,
+                    ),
                   ),
                   child: const Text("Cancel"),
                 ),
@@ -118,16 +141,17 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           ),
                         )
                       : const Icon(Icons.send_rounded, size: 18),
-                  label: const Text("Send Broadcast"),
+                  label: const Text("Send Now"),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF4F46E5),
                     foregroundColor: Colors.white,
+                    elevation: 0,
                     padding: const EdgeInsets.symmetric(
-                      horizontal: 20,
-                      vertical: 12,
+                      horizontal: 24,
+                      vertical: 16,
                     ),
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
+                      borderRadius: BorderRadius.circular(12),
                     ),
                   ),
                   onPressed: isLoading
@@ -153,6 +177,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                     ? Colors.green[700]
                                     : Colors.red[700],
                                 behavior: SnackBarBehavior.floating,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                margin: const EdgeInsets.all(20),
                               ),
                             );
                           }
@@ -174,43 +202,54 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
         return Scaffold(
           key: _scaffoldKey,
-          backgroundColor: const Color(0xFFF3F4F6),
+          backgroundColor: const Color(0xFFF8FAFC),
           drawer: !isDesktop ? const DashboardSidebar() : null,
           appBar: !isDesktop
               ? AppBar(
                   backgroundColor: Colors.white,
+                  surfaceTintColor: Colors.white,
                   elevation: 0,
+                  centerTitle: true,
                   leading: IconButton(
-                    icon: const Icon(Icons.menu, color: Colors.black),
+                    icon: const Icon(Icons.menu_rounded, color: Colors.black),
                     onPressed: () => _scaffoldKey.currentState?.openDrawer(),
                   ),
                   title: const Text(
-                    "DreamStay Admin",
+                    "Overview",
                     style: TextStyle(
-                      color: Colors.black,
+                      color: Color(0xFF1E293B),
+                      fontSize: 18,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                   actions: [
                     IconButton(
                       icon: const Icon(
-                        Icons.campaign,
+                        Icons.campaign_outlined,
                         color: Color(0xFF4F46E5),
                       ),
                       onPressed: () => _showBroadcastDialog(context),
                     ),
+                    const SizedBox(width: 8),
                   ],
+                  bottom: PreferredSize(
+                    preferredSize: const Size.fromHeight(1),
+                    child: Container(color: Colors.grey.shade200, height: 1),
+                  ),
                 )
               : null,
           floatingActionButton: isDesktop
               ? FloatingActionButton.extended(
                   onPressed: () => _showBroadcastDialog(context),
                   backgroundColor: const Color(0xFF4F46E5),
-                  elevation: 4,
-                  icon: const Icon(Icons.campaign, color: Colors.white),
+                  elevation: 2,
+                  icon: const Icon(Icons.campaign_rounded, color: Colors.white),
                   label: const Text(
                     "New Broadcast",
-                    style: TextStyle(color: Colors.white),
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 )
               : null,
@@ -222,7 +261,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 child: BlocBuilder<AdminCubit, AdminState>(
                   builder: (context, state) {
                     if (state is AdminLoading) {
-                      return const Center(child: CircularProgressIndicator());
+                      return const Center(
+                        child: CircularProgressIndicator(
+                          color: Color(0xFF4F46E5),
+                        ),
+                      );
                     }
 
                     if (state is AdminError) {
@@ -230,29 +273,33 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            const Icon(
-                              Icons.error_outline,
-                              size: 64,
-                              color: Colors.red,
+                            Container(
+                              padding: const EdgeInsets.all(20),
+                              decoration: BoxDecoration(
+                                color: Colors.red.shade50,
+                                shape: BoxShape.circle,
+                              ),
+                              child: Icon(
+                                Icons.cloud_off_rounded,
+                                size: 48,
+                                color: Colors.red.shade400,
+                              ),
                             ),
                             const SizedBox(height: 16),
                             Text(
                               state.message,
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 16,
-                                color: Colors.red,
+                                fontWeight: FontWeight.w500,
+                                color: Colors.grey.shade700,
                               ),
                             ),
                             const SizedBox(height: 24),
                             ElevatedButton.icon(
                               onPressed: () =>
                                   context.read<AdminCubit>().loadDashboard(),
-                              icon: const Icon(Icons.refresh),
-                              label: const Text("Retry"),
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: const Color(0xFF4F46E5),
-                                foregroundColor: Colors.white,
-                              ),
+                              icon: const Icon(Icons.refresh_rounded),
+                              label: const Text("Try Again"),
                             ),
                           ],
                         ),
@@ -263,6 +310,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       return RefreshIndicator(
                         onRefresh: () async =>
                             context.read<AdminCubit>().loadDashboard(),
+                        color: const Color(0xFF4F46E5),
                         child: ListView(
                           padding: EdgeInsets.all(isDesktop ? 40 : 20),
                           children: [
@@ -271,23 +319,26 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
                                 children: [
-                                  const Column(
+                                  Column(
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
                                     children: [
-                                      Text(
+                                      const Text(
                                         "Dashboard Overview",
                                         style: TextStyle(
                                           fontSize: 28,
                                           fontWeight: FontWeight.w800,
-                                          color: Color(0xFF1F2937),
+                                          color: Color(0xFF1E293B),
                                           letterSpacing: -0.5,
                                         ),
                                       ),
-                                      SizedBox(height: 4),
+                                      const SizedBox(height: 6),
                                       Text(
-                                        "Welcome back, Admin",
-                                        style: TextStyle(color: Colors.grey),
+                                        "Welcome back, here's what's happening today.",
+                                        style: TextStyle(
+                                          color: Colors.grey.shade500,
+                                          fontSize: 15,
+                                        ),
                                       ),
                                     ],
                                   ),
@@ -295,53 +346,106 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                     onPressed: () => context
                                         .read<AdminCubit>()
                                         .loadDashboard(),
-                                    icon: const Icon(Icons.refresh),
+                                    icon: const Icon(Icons.refresh_rounded),
+                                    tooltip: "Refresh Data",
                                     style: IconButton.styleFrom(
                                       backgroundColor: Colors.white,
+                                      padding: const EdgeInsets.all(12),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(12),
+                                        side: BorderSide(
+                                          color: Colors.grey.shade200,
+                                        ),
+                                      ),
                                     ),
                                   ),
                                 ],
                               ),
-                              const SizedBox(height: 32),
+                              const SizedBox(height: 40),
                             ],
-                            Wrap(
-                              spacing: 20,
-                              runSpacing: 20,
+
+                            // Stats Grid
+                            LayoutBuilder(
+                              builder: (context, constraints) {
+                                final width = constraints.maxWidth;
+                                // Calculate ideal item width (min 240)
+                                int crossAxisCount = (width / 240).floor();
+                                if (crossAxisCount < 1) crossAxisCount = 1;
+                                if (crossAxisCount > 4) crossAxisCount = 4;
+
+                                return Wrap(
+                                  spacing: 20,
+                                  runSpacing: 20,
+                                  children: [
+                                    _buildStatWrapper(
+                                      StatCard(
+                                        title: "Total Users",
+                                        value: "${state.stats.totalUsers}",
+                                        icon: Icons.group_outlined,
+                                        color: const Color(0xFF3B82F6),
+                                      ),
+                                      width,
+                                      crossAxisCount,
+                                    ),
+                                    _buildStatWrapper(
+                                      StatCard(
+                                        title: "Pending Approval",
+                                        value: "${state.stats.pendingUsers}",
+                                        icon: Icons.hourglass_top_rounded,
+                                        color: const Color(0xFFF59E0B),
+                                      ),
+                                      width,
+                                      crossAxisCount,
+                                    ),
+                                    _buildStatWrapper(
+                                      StatCard(
+                                        title: "Active Users",
+                                        value: "${state.stats.activeUsers}",
+                                        icon:
+                                            Icons.check_circle_outline_rounded,
+                                        color: const Color(0xFF10B981),
+                                      ),
+                                      width,
+                                      crossAxisCount,
+                                    ),
+                                    _buildStatWrapper(
+                                      StatCard(
+                                        title: "Total Bookings",
+                                        value: "${state.stats.totalBookings}",
+                                        icon: Icons.bookmark_border_rounded,
+                                        color: const Color(0xFF8B5CF6),
+                                      ),
+                                      width,
+                                      crossAxisCount,
+                                    ),
+                                  ],
+                                );
+                              },
+                            ),
+
+                            const SizedBox(height: 40),
+
+                            // Table Section
+                            Row(
                               children: [
-                                StatCard(
-                                  title: "Total Users",
-                                  value: "${state.stats.totalUsers}",
-                                  icon: Icons.group_outlined,
-                                  color: Colors.blue,
+                                Container(
+                                  width: 4,
+                                  height: 24,
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFF4F46E5),
+                                    borderRadius: BorderRadius.circular(4),
+                                  ),
                                 ),
-                                StatCard(
-                                  title: "Pending Approval",
-                                  value: "${state.stats.pendingUsers}",
-                                  icon: Icons.hourglass_top,
-                                  color: Colors.orange,
-                                ),
-                                StatCard(
-                                  title: "Active Users",
-                                  value: "${state.stats.activeUsers}",
-                                  icon: Icons.check_circle_outline,
-                                  color: Colors.green,
-                                ),
-                                StatCard(
-                                  title: "Total Bookings",
-                                  value: "${state.stats.totalBookings}",
-                                  icon: Icons.bookmark_border,
-                                  color: Colors.purple,
+                                const SizedBox(width: 12),
+                                const Text(
+                                  "User Management",
+                                  style: TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold,
+                                    color: Color(0xFF1E293B),
+                                  ),
                                 ),
                               ],
-                            ),
-                            const SizedBox(height: 40),
-                            const Text(
-                              "User Management",
-                              style: TextStyle(
-                                fontSize: 22,
-                                fontWeight: FontWeight.bold,
-                                color: Color(0xFF1F2937),
-                              ),
                             ),
                             const SizedBox(height: 20),
                             UserManagementTable(
@@ -363,5 +467,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
         );
       },
     );
+  }
+
+  Widget _buildStatWrapper(Widget child, double parentWidth, int count) {
+    final gapTotal = (count - 1) * 20.0;
+    final itemWidth = (parentWidth - gapTotal) / count;
+    return SizedBox(width: itemWidth, child: child);
   }
 }

@@ -33,75 +33,91 @@ class AdminRemoteDataSourceImpl implements AdminRemoteDataSource {
     };
   }
 
+  Future<T> _handleRequest<T>(
+    Future<http.Response> Function() request,
+    T Function(dynamic data) onSuccess,
+  ) async {
+    try {
+      final response = await request();
+      final body = jsonDecode(response.body);
+
+      if (response.statusCode >= 200 && response.statusCode < 300) {
+        return onSuccess(body);
+      } else {
+        throw Exception(body['message'] ?? 'Request failed');
+      }
+    } catch (e) {
+      final msg = e.toString().replaceAll('Exception: ', '');
+      throw Exception(msg);
+    }
+  }
+
   @override
   Future<AdminStatModel> getStats() async {
-    final response = await client.get(
-      Uri.parse('${ApiConstants.baseUrl}/admin/stats'),
-      headers: await _getHeaders(),
+    return _handleRequest(
+      () async => client.get(
+        Uri.parse('${ApiConstants.baseUrl}/admin/stats'),
+        headers: await _getHeaders(),
+      ),
+      (data) => AdminStatModel.fromJson(data),
     );
-
-    if (response.statusCode == 200) {
-      return AdminStatModel.fromJson(jsonDecode(response.body));
-    } else {
-      throw Exception('Failed to load stats');
-    }
   }
 
   @override
   Future<List<AdminUserModel>> getUsers() async {
-    final response = await client.get(
-      Uri.parse('${ApiConstants.baseUrl}/admin/users'),
-      headers: await _getHeaders(),
-    );
-
-    if (response.statusCode == 200) {
-      final data = jsonDecode(response.body);
-      return (data['data'] as List)
+    return _handleRequest(
+      () async => client.get(
+        Uri.parse('${ApiConstants.baseUrl}/admin/users'),
+        headers: await _getHeaders(),
+      ),
+      (data) => (data['data'] as List)
           .map((e) => AdminUserModel.fromJson(e))
-          .toList();
-    } else {
-      throw Exception('Failed to load users');
-    }
+          .toList(),
+    );
   }
 
   @override
   Future<Unit> approveUser(int id) async {
-    final response = await client.put(
-      Uri.parse('${ApiConstants.baseUrl}/admin/users/$id/approve'),
-      headers: await _getHeaders(),
+    return _handleRequest(
+      () async => client.put(
+        Uri.parse('${ApiConstants.baseUrl}/admin/users/$id/approve'),
+        headers: await _getHeaders(),
+      ),
+      (_) => unit,
     );
-    if (response.statusCode >= 200 && response.statusCode < 300) return unit;
-    throw Exception('Failed to approve');
   }
 
   @override
   Future<Unit> rejectUser(int id) async {
-    final response = await client.put(
-      Uri.parse('${ApiConstants.baseUrl}/admin/users/$id/reject'),
-      headers: await _getHeaders(),
+    return _handleRequest(
+      () async => client.put(
+        Uri.parse('${ApiConstants.baseUrl}/admin/users/$id/reject'),
+        headers: await _getHeaders(),
+      ),
+      (_) => unit,
     );
-    if (response.statusCode >= 200 && response.statusCode < 300) return unit;
-    throw Exception('Failed to reject');
   }
 
   @override
   Future<Unit> deleteUser(int id) async {
-    final response = await client.delete(
-      Uri.parse('${ApiConstants.baseUrl}/admin/users/$id'),
-      headers: await _getHeaders(),
+    return _handleRequest(
+      () async => client.delete(
+        Uri.parse('${ApiConstants.baseUrl}/admin/users/$id'),
+        headers: await _getHeaders(),
+      ),
+      (_) => unit,
     );
-    if (response.statusCode >= 200 && response.statusCode < 300) return unit;
-    throw Exception('Failed to delete');
   }
 
   @override
   Future<Unit> sendBroadcast(String title, String body) async {
-    final response = await client.post(
-      Uri.parse('${ApiConstants.baseUrl}/admin/notifications/broadcast'),
-      headers: await _getHeaders(),
-      body: jsonEncode({'title': title, 'body': body}),
+    return _handleRequest(
+      () async => client.post(
+        Uri.parse('${ApiConstants.baseUrl}/admin/notifications/broadcast'),
+        headers: await _getHeaders(),
+        body: jsonEncode({'title': title, 'body': body}),
+      ),
+      (_) => unit,
     );
-    if (response.statusCode >= 200 && response.statusCode < 300) return unit;
-    throw Exception('Failed to broadcast');
   }
 }

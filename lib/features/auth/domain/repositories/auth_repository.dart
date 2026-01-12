@@ -6,6 +6,6 @@ abstract class AuthRepository {
     String phone,
     String password,
   );
-  Future<Either<Failure, bool>> checkAuthStatus();
+  Future<Either<Failure, String?>> checkAuthStatus();
   Future<Either<Failure, Unit>> logout();
 }

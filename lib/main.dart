@@ -1,3 +1,4 @@
+import 'package:admin_dashboard/core/widgets/access_denied_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -21,75 +22,97 @@ class AdminApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ScreenUtilInit(
-      designSize: const Size(1440, 900),
+      designSize: const Size(1536.0, 792.8),
       minTextAdapt: true,
       splitScreenMode: true,
       builder: (context, child) {
         return MultiBlocProvider(
           providers: [
-            BlocProvider(create: (_) => di.sl<AuthCubit>()),
-            BlocProvider(create: (_) => di.sl<AdminCubit>()),
+            BlocProvider<AuthCubit>(
+              create: (BuildContext context) => di.sl<AuthCubit>()..checkAuth(),
+            ),
+            BlocProvider<AdminCubit>(
+              create: (BuildContext context) => di.sl<AdminCubit>(),
+            ),
           ],
           child: MaterialApp(
             title: 'DreamStay Admin',
             debugShowCheckedModeBanner: false,
             theme: ThemeData(
               useMaterial3: true,
+              scaffoldBackgroundColor: const Color(0xFFF8FAFC),
               colorScheme: ColorScheme.fromSeed(
                 seedColor: const Color(0xFF4F46E5),
-                surface: const Color(0xFFF3F4F6),
+                primary: const Color(0xFF4F46E5),
+                surface: Colors.white,
+                background: const Color(0xFFF8FAFC),
               ),
-              textTheme: GoogleFonts.interTextTheme(),
+              textTheme: GoogleFonts.interTextTheme(Theme.of(context).textTheme)
+                  .apply(
+                    bodyColor: const Color(0xFF1E293B),
+                    displayColor: const Color(0xFF0F172A),
+                  ),
+              inputDecorationTheme: InputDecorationTheme(
+                filled: true,
+                fillColor: Colors.white,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: const BorderSide(
+                    color: Color(0xFF4F46E5),
+                    width: 2,
+                  ),
+                ),
+                contentPadding: const EdgeInsets.all(16),
+              ),
+              elevatedButtonTheme: ElevatedButtonThemeData(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF4F46E5),
+                  foregroundColor: Colors.white,
+                  elevation: 0,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 24,
+                    vertical: 16,
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  textStyle: const TextStyle(
+                    fontWeight: FontWeight.w600,
+                    fontSize: 16,
+                  ),
+                ),
+              ),
             ),
             home: BlocConsumer<AuthCubit, AuthState>(
               listener: (context, state) {
                 if (state is AuthAuthenticated) {
-                  context.read<AdminCubit>().loadDashboard();
+                  if (state.role == 'admin') {
+                    context.read<AdminCubit>().loadDashboard();
+                  }
                 }
               },
               builder: (context, state) {
+                if (state is AuthLoading) {
+                  return const Scaffold(
+                    body: Center(child: CircularProgressIndicator()),
+                  );
+                }
+
                 if (state is AuthAuthenticated) {
-                  // Only allow access to the dashboard for admin users
                   if (state.role == 'admin') {
                     return const DashboardScreen();
                   }
-                  // Authenticated but not admin - show a minimal access denied screen
-                  return Scaffold(
-                    body: Center(
-                      child: Padding(
-                        padding: const EdgeInsets.all(24.0),
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            const Icon(
-                              Icons.lock_outline,
-                              size: 56,
-                              color: Colors.red,
-                            ),
-                            const SizedBox(height: 12),
-                            const Text(
-                              'Access denied',
-                              style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            const SizedBox(height: 8),
-                            const Text(
-                              'Your account does not have admin permissions.',
-                            ),
-                            const SizedBox(height: 16),
-                            ElevatedButton(
-                              onPressed: () =>
-                                  context.read<AuthCubit>().logout(),
-                              child: const Text('Logout'),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  );
+                  return const AccessDeniedScreen();
                 }
+
                 return const LoginScreen();
               },
             ),

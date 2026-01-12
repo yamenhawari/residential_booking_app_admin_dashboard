@@ -13,51 +13,50 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
 
   @override
   Future<Map<String, dynamic>> login(String phone, String password) async {
-    final response = await client.post(
-      Uri.parse('${ApiConstants.baseUrl}/login'),
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-      },
-      body: jsonEncode({'phone': phone, 'password': password}),
-    );
+    try {
+      final response = await client.post(
+        Uri.parse('${ApiConstants.baseUrl}/login'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        body: jsonEncode({'phone': phone, 'password': password}),
+      );
 
-    if (response.statusCode >= 200 && response.statusCode < 300) {
       final data = jsonDecode(response.body);
-      // Attempt to read token from several possible keys (Token, token, nested)
-      final dynamic tokenRaw =
-          data['Token'] ??
-          data['token'] ??
-          (data is Map && data['data'] is Map ? data['data']['token'] : null);
 
-      // Attempt to locate role in multiple possible shapes, including capitalized 'User'
-      final dynamic userMap = (data is Map)
-          ? (data['user'] ??
-                data['User'] ??
-                (data['data'] is Map ? data['data']['user'] : null) ??
-                (data['data'] is Map ? data['data']['User'] : null))
-          : null;
+      if (response.statusCode >= 200 && response.statusCode < 300) {
+        final dynamic tokenRaw =
+            data['Token'] ??
+            data['token'] ??
+            (data is Map && data['data'] is Map ? data['data']['token'] : null);
 
-      final dynamic roleRaw =
-          data['role'] ??
-          data['Role'] ??
-          (userMap is Map ? (userMap['role'] ?? userMap['Role']) : null) ??
-          (data is Map && data['data'] is Map ? data['data']['role'] : null) ??
-          'tenant';
+        final dynamic userMap = (data is Map)
+            ? (data['user'] ??
+                  data['User'] ??
+                  (data['data'] is Map ? data['data']['user'] : null))
+            : null;
 
-      final String? token = tokenRaw is String
-          ? tokenRaw
-          : (tokenRaw?.toString());
-      final String role = roleRaw is String
-          ? roleRaw.toString().toLowerCase()
-          : 'tenant';
+        final dynamic roleRaw =
+            data['role'] ??
+            (userMap is Map ? (userMap['role'] ?? userMap['Role']) : null) ??
+            'tenant';
 
-      if (token == null || token.isEmpty) {
-        throw Exception('Login response missing token');
+        final String? token = tokenRaw?.toString();
+        final String role = roleRaw?.toString().toLowerCase() ?? 'tenant';
+
+        if (token == null || token.isEmpty) {
+          throw Exception('Server returned success but no token found.');
+        }
+        return {'token': token, 'role': role};
+      } else {
+        // Try to get proper error message from server
+        final msg = data['message'] ?? data['error'] ?? 'Login failed';
+        throw Exception(msg);
       }
-      return {'token': token, 'role': role};
-    } else {
-      throw Exception('Login failed');
+    } catch (e) {
+      final msg = e.toString().replaceAll('Exception: ', '');
+      throw Exception(msg);
     }
   }
 }

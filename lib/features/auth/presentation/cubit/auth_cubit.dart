@@ -10,28 +10,27 @@ class AuthCubit extends Cubit<AuthState> {
   void checkAuth() async {
     emit(AuthLoading());
     final result = await repository.checkAuthStatus();
-    result.fold(
-      (failure) => emit(AuthUnauthenticated()),
-      (isAuthenticated) => isAuthenticated
-          ? emit(AuthAuthenticated('tenant'))
-          : emit(AuthUnauthenticated()),
-    );
+    result.fold((failure) => emit(AuthUnauthenticated()), (role) {
+      if (role != null) {
+        emit(AuthAuthenticated(role));
+      } else {
+        emit(AuthUnauthenticated());
+      }
+    });
   }
 
   void login(String phone, String password) async {
     emit(AuthLoading());
     final result = await repository.login(phone, password);
     result.fold((failure) => emit(AuthError(failure.message)), (data) {
-      final role = (data['role'] is String) ? data['role'] as String : 'tenant';
-      emit(AuthAuthenticated(role.toLowerCase()));
+      final role = data['role'] as String;
+      emit(AuthAuthenticated(role));
     });
   }
 
   void logout() async {
-    final result = await repository.logout();
-    result.fold(
-      (failure) => emit(AuthError(failure.message)),
-      (_) => emit(AuthUnauthenticated()),
-    );
+    // Optimistic UI update
+    emit(AuthUnauthenticated());
+    await repository.logout();
   }
 }

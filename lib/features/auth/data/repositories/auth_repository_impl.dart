@@ -20,11 +20,12 @@ class AuthRepositoryImpl implements AuthRepository {
   ) async {
     try {
       final data = await remoteDataSource.login(phone, password);
-      final token = data['token'] as String?;
-      final role = (data['role'] is String) ? data['role'] as String : 'tenant';
-      if (token == null) return Left(ServerFailure('Invalid login response'));
+      final token = data['token'] as String;
+      final role = data['role'] as String;
+
       await localDataSource.saveToken(token);
       await localDataSource.saveRole(role);
+
       return Right({'token': token, 'role': role});
     } catch (e) {
       return Left(ServerFailure(e.toString()));
@@ -32,10 +33,14 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  Future<Either<Failure, bool>> checkAuthStatus() async {
+  Future<Either<Failure, String?>> checkAuthStatus() async {
     try {
       final token = await localDataSource.getToken();
-      return Right(token != null);
+      if (token != null) {
+        final role = await localDataSource.getRole();
+        return Right(role ?? 'tenant');
+      }
+      return const Right(null); // Not authenticated
     } catch (e) {
       return Left(ServerFailure(e.toString()));
     }
